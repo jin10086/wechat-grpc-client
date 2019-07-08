@@ -1,7 +1,6 @@
 package client
 
 import (
-	"github.com/fastgoo/WechatApi/base"
 	"encoding/json"
 )
 
@@ -14,32 +13,51 @@ const (
 /**
  * 获取标签列表
  */
-func GetLabels() interface{} {
-	ret := base.FastCallUploadData(CmdGetLabelList, []byte{})
-	print(string(ret.GetBaseMsg().GetPayloads()))
+func GetLabels(wxUser string) interface{} {
+	var (
+		result []byte
+		err    error
+	)
+	FastShortRequest(wxUser, CmdGetLabelList, []byte{}, "获取标签列表成功", &result, &err)
+	if err != nil {
+		return nil
+	}
 	var responseData interface{}
-	json.Unmarshal(ret.GetBaseMsg().GetPayloads(), &responseData)
+	json.Unmarshal(result, &responseData)
 	return responseData
 }
 
 /**
  * 新增标签
  */
-func AddLabel(name string) interface{} {
-	ret := base.FastCallUploadData(CmdAddLabel, []byte(`{
+func AddLabel(wxUser string, name string) interface{} {
+	var (
+		result []byte
+		err    error
+	)
+	FastShortRequest(wxUser, CmdAddLabel, []byte(`{
 		"LabelName": "`+name+`"
-	}`))
-	print(string(ret.GetBaseMsg().GetPayloads()))
+	}`), "新增标签列表成功", &result, &err)
+	if err != nil {
+		return nil
+	}
 	var responseData interface{}
-	json.Unmarshal(ret.GetBaseMsg().GetPayloads(), &responseData)
+	json.Unmarshal(result, &responseData)
 	return responseData
 }
 
 //不可用
-func SetUserLabel(user string, labelIds string) {
-	ret := base.FastCallUploadData(CmdSetUserLabel, []byte(`{
+func SetUserLabel(wxUser string, user string, labelIds string) bool {
+	var (
+		result []byte
+		err    error
+	)
+	FastShortRequest(wxUser, CmdSetUserLabel, []byte(`{
 		"Username": "`+user+`",
 		"Labelids": "`+labelIds+`"
-	}`))
-	print(string(ret.GetBaseMsg().GetPayloads()))
+	}`), "设置用户标签成功", &result, &err)
+	if err != nil {
+		return false
+	}
+	return true
 }
